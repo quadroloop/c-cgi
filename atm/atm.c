@@ -27,9 +27,9 @@ Author:
    long m,n;
    int pin,balance;
    char *accountNumber[],*accountName[];
-    bool done = true;
-    FILE *account;
-    char accountsDIR[50] = "./accounts/", accountsOffset[100], *ruser,*rpin,*rname,*action,*tbalance,*tamount,*tmethod,*tdate;
+   bool done = true;
+   FILE *account;
+   char accountsDIR[50] = "./accounts/", accountsOffset[100], *ruser,*rpin,*rname,*action,*tbalance,*initbalance,*tamount,*tmethod,*tdate;
 
 // json response object
 int json_res(char message[],int status){
@@ -108,15 +108,18 @@ printf("%s%c%c\n",
                 action = output;
              }
               if(cnt == 5){
-                tbalance = output;
+                initbalance = output;
              }
               if(cnt == 6){
                 tamount = output;
              }
               if(cnt == 7){
-                tmethod = output;
+                tbalance = output;
              }
               if(cnt == 8){
+                tmethod = output;
+             }
+              if(cnt == 9){
                 tdate = output;
              }
          ++cnt;      
@@ -125,10 +128,10 @@ printf("%s%c%c\n",
 
      //  register user
      // check of account already exist
-        if(strcmp(action,"register",20) == 0){
-            char *userAcc; 
+       char *userAcc; 
             userAcc = strcat(accountsDIR,ruser);
 
+        if(strcmp(action,"register",20) == 0){
              if( access(userAcc, F_OK ) != -1 ) {
                     printf("Sorry, account already exists");
                 } else {
@@ -155,7 +158,6 @@ printf("%s%c%c\n",
 
        // user login
         if(strcmp(action,"login",20) == 0){
-            char *userAcc1; 
             char str[60];
             FILE *account1;
             FILE *accName1;
@@ -163,10 +165,8 @@ printf("%s%c%c\n",
             char cbalance[60];
 
            
-           // check if file  account exist
-            userAcc1 = strcat(accountsDIR,ruser);
             // get account data ahead
-             accName1 = fopen(userAcc1,"r");
+             accName1 = fopen(userAcc,"r");
                 if(accName1 == NULL) {
                  printf("Error accessing account in account in DB");
                   return(-1);
@@ -175,7 +175,7 @@ printf("%s%c%c\n",
                  }
                  fclose(accName1); 
               // get balance
-               accName1 = fopen(strcat(userAcc1,"_balance"),"r");
+               accName1 = fopen(strcat(userAcc,"_balance"),"r");
                 if(accName1 == NULL) {
                  printf("Error accessing ac in account in DB");
                   return(-1);
@@ -185,9 +185,9 @@ printf("%s%c%c\n",
                  fclose(accName1);   
 
                  // check if file exist  
-              if( access(userAcc1, F_OK ) != -1 ) {
+              if( access(userAcc, F_OK ) != -1 ) {
                 // authenticate pin
-              account1 = fopen(strcat(userAcc1,"_pin"),"r");
+              account1 = fopen(strcat(userAcc,"_pin"),"r");
                fgets (cpin,60,account1); 
                fclose(account1);
                 // check if pin is correct
@@ -213,12 +213,10 @@ printf("%s%c%c\n",
 
         //transact the balance (withdraw, deposit)
          if(strcmp(action,"transact",20) == 0){
-               char *userAcc2;
                FILE *account3;
-               userAcc2 = strcat("./accounts/",ruser); 
-           
+
               // perform transaction and update balance
-               account3 = fopen(strcat(userAcc2,"_balance"), "w");
+               account3 = fopen(strcat(userAcc,"_balance"), "w");
                       // save initial balance
                       // peform balance update
                       fputs(tbalance,account3);
@@ -227,10 +225,10 @@ printf("%s%c%c\n",
                       printf("%s",tbalance);
 
               // record transaction
-               account3 = fopen(strcat(userAcc2,"_records"), "w+");
+               account3 = fopen(strcat(userAcc,"_records"), "a");
                       fputs(tmethod,account3);
                       fputs(",",account3);
-                      fputs(tbalance,account3);
+                      fputs(initbalance,account3);
                       fputs(",",account3);
                       fputs(tamount,account3);
                       fputs(",",account3);

@@ -41,6 +41,7 @@ body {
   background: linear-gradient(rgba(243, 246, 246, 0.86),#eee), url(../img/poly.jpg) top center;
 	background-size: cover;
 	height: 100vh;
+  position: relative;
 	overflow: hidden; 
 }
 

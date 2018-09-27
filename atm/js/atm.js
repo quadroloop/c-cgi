@@ -1,4 +1,8 @@
 
+window.onload = function() {
+  document.getElementById("accNum").focus();
+}
+
 function Openregister(){
 	document.getElementById('login').classList.add("slideOutLeft");
 	setTimeout(()=>{
@@ -8,10 +12,17 @@ function Openregister(){
 
 }
 
+const formatPrice = (n) => {
+  var parts = n.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+}
+
+
 	function status(message){
 		Toastify({
 			text: "<i class='fa fa-check-circle'></i> "+message,
-			duration: 5000,
+			duration: 3000,
 			newWindow: true,
 			close: true,
 			gravity: "top", // `top` or `bottom`
@@ -23,7 +34,7 @@ function Openregister(){
 	function error(message){
     Toastify({
       text: "<i class='fa fa-times-circle'></i> "+message,
-      duration: 8000,
+      duration: 3000,
       newWindow: true,
       close: true,
       gravity: "top", // `top` or `bottom`
@@ -33,7 +44,21 @@ function Openregister(){
   }
 
 function authChk() {
-	return true;
+    var accNum = document.getElementById("accNum"); 
+    var pin = document.getElementById("pin");
+  	  axios.get("atm.cgi?accNum="+accNum.value+"~null~"+pin.value+"~login")
+          .then((res)=>{
+             var data = res.data.split(",");
+               if(data.length == 4){
+                  localStorage.auth = true;
+                  localStorage.userName = decodeURIComponent(data[1]); 
+                  localStorage.accNum = data[2];
+                  localStorage.Balance = data[3];
+                  logSetup();
+               }else{
+                error(data);
+               }
+          });
 }
 
 
@@ -43,16 +68,79 @@ function Openlogin() {
 
 
 function login() {
-	if(authChk() == true){
-		document.getElementById('login').classList.add("flipOutX");
-	setTimeout(()=>{
-		document.getElementById("login").style.display = "none";
-		document.getElementById('app').style.display = "block";
-		status("Successfully Logged In");
-		document.body.classList.add("vertical-scroll")
-	},700);
+  authChk();
+}
 
-	}
+function tcolor(transaction){
+   var t = transaction.toLowerCase();
+      if(t == "deposit"){
+         return "text-success";
+      }else{
+        return "text-danger";
+      }
+}
+
+function calendar(){
+  var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth()+1; //January is 0!
+var yyyy = today.getFullYear();
+
+    if(dd<10) {
+        dd = '0'+dd
+    } 
+
+    if(mm<10) {
+        mm = '0'+mm
+    } 
+
+    today = mm + '-' + dd + '-' + yyyy;
+    return today;
+}
+
+function logSetup(){
+   document.getElementById('login').classList.add("flipOutX");
+  setTimeout(()=>{
+    document.getElementById("login").style.display = "none";
+    document.getElementById('app').style.display = "block";
+    status("Successfully Logged In");  
+    document.body.classList.add("vertical-scroll")
+    // document.body.style.height = "100%";
+
+    // parse values
+
+     // set welcome
+     document.getElementById("firstName").innerText = localStorage.userName.split(" ")[0];
+    //get balance
+    document.getElementById("accbal").innerText = formatPrice(localStorage.Balance);
+    // set name 
+    document.getElementById("uname").innerText = localStorage.userName;
+    // set acc num.
+    document.getElementById("accnum1").innerText = localStorage.accNum;
+    // set list of transactions 
+    axios.get("./accounts/"+localStorage.accNum+"_balance_records")
+     .then((res)=>{
+       if(res.data){
+           var data = res.data.split("\n");
+             for(var i=data.length; i--;){
+               if(data[i]){
+                var details = data[i].split(",");
+                    document.getElementById("tlog").innerHTML += `
+                      <td><strong class="`+tcolor(details[0])+`" style="text-transform: capitalize;">`+details[0]+`</strong></td>
+                        <td>&#x20b1; `+formatPrice(details[1])+`</td>
+                        <td>&#x20b1; `+formatPrice(details[2])+`</td>
+                        <td>&#x20b1; `+formatPrice(details[3])+`</td>
+                        <td>`+details[4]+`</td>
+                      </tr>
+                    `;
+                  }
+             }
+       }else{
+         document.getElementById("tlog").innerHTML = "<h3 class='text-none'><i class='fa fa-file-text-o'> Nothing to show..</h3>";
+       }
+     });
+
+  },700);
 }
 
 function wdraw(){
@@ -63,7 +151,7 @@ function wdraw(){
 		    <br>
 			    <div class="p-2 nav-red rounded">
 			       <span class="text-white pt-1"><i class="fa fa-circle text-warning"></i> Current Balance</span>
-			       <h3 class="text-white">₱ 12,000</h3>
+			       <h3 class="text-white">&#x20b1; `+formatPrice(localStorage.Balance)+`</h3>
 			    </div>  
            			    <br>
            		   <input class="mt-1 p-2 rounded border" placeholder="Amount to Withdraw" id="wvalue">   
@@ -72,20 +160,36 @@ function wdraw(){
     }).then((res)=>{
         if(res){
            var Withdrawal_value = document.getElementById("wvalue").value;
-              if(Withdrawal_value){
+           if(Withdrawal_value){
+
+            if(parseInt(Withdrawal_value) > parseInt(localStorage.Balance)){
+              error("Insufficent Funds!");
+              return false;
+            }
+           var balVal = parseInt(localStorage.Balance) - parseInt(Withdrawal_value);
+           axios("atm.cgi?accNum="+localStorage.accNum+"~null~null~transact~"+localStorage.Balance+"~"+Withdrawal_value+"~"+balVal+"~withdraw~"+calendar())
+             .then((res)=>{
+              if(res.data){
+              
                  swal({
                  	title: "Transaction Complete",
                  	type: "success",
-                 	text: "You withdrawed ₱ "+Withdrawal_value+" from your account",
+                 	text: "You withdrew "+formatPrice(Withdrawal_value)+" from your account",
                  	showCancelButton: false,
                  	showConfirmButton: false,
-                 	timer: 2000
+                 	timer: 3000
                  }) 	
-           }else{
-           	  error("Error: no specified amout, Transaction Cancelled");
+                 setTimeout(()=>{
+                 window.location.reload();
+               },2500);
+               }
+         
+          });
+            }else{
+              error("Error: no specified amout, Transaction Cancelled");
            }
-        }
-    })
+          }
+    })         
    }
 
 
@@ -97,28 +201,39 @@ function deposit(){
 		    <br>
 			    <div class="p-2 bg-green rounded">
 			       <span class="text-white pt-1"><i class="fa fa-circle text-info"></i> Current Balance</span>
-			       <h3 class="text-white">₱ 12,000</h3>
+			       <h3 class="text-white">&#x20b1; `+formatPrice(localStorage.Balance)+`</h3>
 			    </div>  
            			    <br>
            		   <input class="mt-1 p-2 rounded border" placeholder="Amount to Withdraw" id="wvalue">   
              </div>`,
         showCancelButton: true,     
     }).then((res)=>{
-        if(res){
+         if(res){
            var Withdrawal_value = document.getElementById("wvalue").value;
-              if(Withdrawal_value){
+           if(Withdrawal_value){
+           var balVal = parseInt(localStorage.Balance) + parseInt(Withdrawal_value);
+           axios("atm.cgi?accNum="+localStorage.accNum+"~null~null~transact~"+localStorage.Balance+"~"+Withdrawal_value+"~"+balVal+"~deposit~"+calendar())
+             .then((res)=>{
+              if(res.data){
+              
                  swal({
-                 	title: "Transaction Complete",
-                 	type: "success",
-                 	text: "You Deposited ₱ "+Withdrawal_value+" from your account",
-                 	showCancelButton: false,
-                 	showConfirmButton: false,
-                 	timer: 2000
-                 }) 	
-           }else{
-           	  error("Error: no specified amout, Transaction Cancelled");
+                  title: "Transaction Complete",
+                  type: "success",
+                  text: "You deposited "+formatPrice(Withdrawal_value)+" from your account",
+                  showCancelButton: false,
+                  showConfirmButton: false,
+                  timer: 3000
+                 })   
+               }
+                setTimeout(()=>{
+                 window.location.reload();
+               },2500);
+         
+          });
+            }else{
+              error("Error: no specified amout, Transaction Cancelled");
            }
-        }
+          }
     })
 }
 
@@ -154,11 +269,16 @@ function cpin(){
 }
 
 function register() {
+  var accountNum = document.getElementById("raccNum");
 	var accountName = document.getElementById("accName");
 	var ppin = document.getElementById("ppin");
   var cppin = document.getElementById("cppin");
-	   if(accountName.value && ppin.value && cppin.value){
+	   if(accountNum.value && accountName.value && ppin.value && cppin.value){
         if(cppin.value == ppin.value){
+
+          axios.get("atm.cgi?accNum="+accountNum.value+"~"+accountName.value+"~"+ppin.value+"~register")
+          .then((res)=>{
+          if(res.data.length != 29){
            swal({
            	 html: `
                  <h3>Account Created!</h3>
@@ -168,14 +288,17 @@ function register() {
 			       <hr>
 			       <ul class="p-0" style="list-style:none;">
 			            <li class="text-white">Account Name: `+accountName.value+`</li>
-				       <li class="text-white">Account Number: 11-22-33</li>
+				       <li class="text-white">Account Number: `+accountNum.value+`</li>
 				       <li class="text-white">PIN: `+ppin.value+`</li>
 			       </ul>
-
 			    </div>
            	 `,
            	 type: 'success',
            })
+          }else{
+            error(res.data);
+          }
+         });
          }else{
             error("Error: pins you typed did not match!");
          }

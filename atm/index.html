@@ -30,9 +30,9 @@
   	 	</div>
 
   	 </div>
-  	    <input type="password" placeholder="Account Number" class="pin mt-3 animated fadeInUp delay-300">
+  	    <input id="accNum" type="password" placeholder="Account Number" class="pin mt-3 animated fadeInUp delay-300">
   	 	<br>
-  	 	<input type="password" placeholder="Enter your PIN" class="pin mt-3 animated fadeInUp delay-300">
+  	 	<input id="pin" type="password" placeholder="Enter your PIN" class="pin mt-3 animated fadeInUp delay-300">
   	 	<br>  
   	 	<button class="mt-4 btn btn-round btn-danger animated bounceIn delay-700" onclick="login()">Proceed <i class="fa fa-chevron-right ml-2"></i></button>
 
@@ -45,17 +45,19 @@
 <!-- register -->
   <div class="animated slideInRight delay-200 screen" id="register">
   	 <center>
-  	 	<div class="pt-5">
+  	 	<div class="pt-1">
   	 	<div class="pt-5">
   	         <h2 class="p-4 logo-text"><i class="fa fa-bank btn-just-icon nav-red btn"></i> Bank<span class="text-muted">-</span><span class="text-danger">C</span></h2>
   	 	 </div>
   	 	   <span class="text-muted"><i class="fa fa-circle text-danger"></i> Create an Account!</span>
   	 	</div>
+        <input id="raccNum" type="text" placeholder="Account Number" class="data mt-3 animated fadeInUp delay-300">
+        <br>
   	    <input id="accName" type="text" placeholder="Account Name" class="data mt-3 animated fadeInUp delay-300">
   	 	<br>
-  	 	<input id="ppin" type="text" placeholder="Enter your preferred PIN" class="data mt-3 animated fadeInUp delay-400">
+  	 	<input id="ppin" type="password" placeholder="Enter your preferred PIN" class="data mt-3 animated fadeInUp delay-400">
       <br>
-      <input id="cppin" type="text" placeholder="Confirm your preferred PIN" class="data mt-3 animated fadeInUp delay-400">
+      <input id="cppin" type="password" placeholder="Confirm your preferred PIN" class="data mt-3 animated fadeInUp delay-400">
 
   	 	<br>  
   	 	<button  onclick="register();" class="mt-4 btn btn-round btn-danger animated bounceIn delay-700">Proceed <i class="fa fa-chevron-right ml-2"></i></button>
@@ -73,25 +75,25 @@
       <div class="logout-btn">
       	  <button class="btn btn-danger btn btn-sm btn-round" onclick="location.reload()">Log out <i class="fa fa-arrow-right"></i></button>
       </div>
-               <h4 class="px-4">Welcome <strong>Bryce</strong>!</h4>
+               <h4 class="px-4">Welcome <strong id="firstName">Bryce</strong>!</h4>
 
       <div class="row px-4">
-      	  <div class="col-md-3 nav-red p-4 mx-2 mt-2 rounded text-white">
+      	  <div class="col-md-3 nav-red p-4 mx-2 mt-2 rounded text-white" style="max-height: 400px;">
       	  	  <p><i class="fa fa-bullseye"></i> Balance</p>
       	  	  <hr>
-      	  	  <h2>&#x20b1; 12,000</h2>
+      	  	  <h2>&#x20b1; <span id="accbal">12,000</span></h2>
 	      	  	  <ul class="p-0" style="list-style: none">
 	      	  	  	 <li class="small"><i class="fa fa-circle text-warning"></i> Standard Savings Account</li>
 	      	  	  </ul>
       	  	  <hr>
       	        <ul class="p-0" style="list-style: none">
-	      	  	  	 <li class="small"><i class="fa fa-user-circle text-info"></i> Bryce Narciso C. Mercines</li>
-	      	  	  	 <li class="small"><i class="fa fa-credit-card text-info"></i> 15-211-234</li>
+	      	  	  	 <li class="small"><i class="fa fa-user-circle text-info"></i> <span id="uname">Bryce Narciso C. Mercines</span></li>
+	      	  	  	 <li class="small"><i class="fa fa-credit-card text-info"></i> <span id="accnum1">15-211-234</span></li>
 
 	      	  	  </ul>
       	  	  	<button class="btn btn-warning btn-round btn-span" onclick="wdraw()"><i class="fa fa-minus-circle mr-2"></i> Withdraw</button>
       	  	  	<button class="btn btn-warning btn-round btn-span" onclick="deposit()"><i class="fa fa-plus-circle mr-2"></i> Deposit</button>
-      	  	  	<button class="btn btn-warning btn-round btn-span" onclick="cpin()"><i class="fa fa-bars mr-2"></i> Change Pin</button>
+      	  	  	<!-- <button class="btn btn-warning btn-round btn-span" onclick="cpin()"><i class="fa fa-bars mr-2"></i> Change Pin</button> -->
       	  	  </div>
 
 
@@ -105,55 +107,14 @@
                   <table class="table table-hover">
                     <thead class="text-warning">
                       <th><strong>Method</strong></th>
-                      <th><strong>Intial Balance</strong></th>
+                      <th><strong>Initial Balance</strong></th>
                       <th><strong>Transaction amount</strong></th>
                       <th><strong>Post transaction balance</strong></th>
                       <th><strong>Date</strong></th>
 
 
                     </thead>
-                    <tbody>
-
-                      <tr>
-                        <td><strong class="text-danger">Withdrawal</strong></td>
-                        <td>&#x20b1; 14,000</td>
-                        <td>&#x20b1; 2,000</td>
-                        <td>&#x20b1; 12,000</td>
-                        <td>9/09/2018</td>
-                      </tr>
-
-                       <tr>
-                        <td><strong class="text-danger">Withdrawal</strong></td>
-                        <td>&#x20b1; 14,000</td>
-                        <td>&#x20b1; 2,000</td>
-                        <td>&#x20b1; 12,000</td>
-                        <td>9/09/2018</td>
-                      </tr>
-
-                       <tr>
-                        <td><strong class="text-success">Deposit</strong></td>
-                        <td>&#x20b1; 14,000</td>
-                        <td>&#x20b1; 2,000</td>
-                        <td>&#x20b1; 12,000</td>
-                        <td>9/09/2018</td>
-                      </tr>
-
-                       <tr>
-                        <td><strong class="text-danger">Withdrawal</strong></td>
-                        <td>&#x20b1; 14,000</td>
-                        <td>&#x20b1; 2,000</td>
-                        <td>&#x20b1; 12,000</td>
-                        <td>9/09/2018</td>
-                      </tr>
-
-                       <tr>
-                        <td><strong class="text-danger">Withdrawal</strong></td>
-                        <td>&#x20b1; 14,000</td>
-                        <td>&#x20b1; 2,000</td>
-                        <td>&#x20b1; 12,000</td>
-                        <td>9/09/2018</td>
-                      </tr>
-
+                    <tbody id="tlog">
                     </tbody>
                   </table>
                 </div>

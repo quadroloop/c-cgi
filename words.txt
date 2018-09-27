@@ -1,0 +1,12 @@
+test 
+loop
+poop
+toop
+wow
+chow
+cow
+lol
+pip
+pop
+push
+delta

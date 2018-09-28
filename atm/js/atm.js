@@ -204,7 +204,7 @@ function deposit(){
 			       <h3 class="text-white">&#x20b1; `+formatPrice(localStorage.Balance)+`</h3>
 			    </div>  
            			    <br>
-           		   <input class="mt-1 p-2 rounded border" placeholder="Amount to Withdraw" id="wvalue">   
+           		   <input class="mt-1 p-2 rounded border" placeholder="Amount to Deposit" id="wvalue">   
              </div>`,
         showCancelButton: true,     
     }).then((res)=>{

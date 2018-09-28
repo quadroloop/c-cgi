@@ -2,10 +2,11 @@
 var s;
 var scl = 20;
 var food;
-playfield = 340;
+var playfield = parseInt(screen.availWidth);
+
+
 
 // p5js Setup function - required
-
 function setup() {
   createCanvas(playfield, 400);
   background(51);
@@ -35,7 +36,7 @@ function draw() {
 function pickLocation() {
   var cols = floor(playfield/scl);
   var rows = floor(playfield/scl);
-  food = createVector(floor(random(cols)), floor(random(rows)));
+  food = createVector(floor(random(20)), floor(random(20)));
   food.mult(scl);
 
   // Check the food isn't appearing inside the tail
@@ -116,6 +117,7 @@ function Snake() {
     if (d < 1) {
       this.total++;
       this.score++;
+      localStorage.score = this.score;
       text(this.score, 70, 625);
       if (this.score > this.highscore) {
         this.highscore = this.score;
@@ -135,6 +137,8 @@ function Snake() {
         this.total = 0;
         this.score = 0;
         this.tail = [];
+        swal("Game Over","your score: "+localStorage.score,"error");
+        localStorage.score = 0;
       }
     }
   }
